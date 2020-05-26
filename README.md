@@ -22,7 +22,7 @@ pod 'SwiftfulCache'
 
 ## Author
 
-vigotskij, boris.sortino@gmail.com
+[Boris Sortino](https://linkedin.com/in/bsortino/)
 
 ## License
 

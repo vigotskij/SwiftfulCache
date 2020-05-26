@@ -1,0 +1,6 @@
+framework module Pods_SwiftfulCache_Example {
+  umbrella header "Pods-SwiftfulCache_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}
