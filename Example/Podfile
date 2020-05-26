@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'SwiftfulCache_Example' do
+  pod 'SwiftfulCache', :path => '../'
+
+  target 'SwiftfulCache_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
