@@ -27,10 +27,10 @@ Pod::Spec.new do |s|
   s.author           = { 'Boris Sortino' => 'boris.sortino@gmail.com' }
   s.source           = { :git => 'https://github.com/vigotskij/SwiftfulCache.git', :tag => s.version.to_s }
   s.social_media_url = 'https://linkedin.com/in/bsortino/'
-
+  s.requires_arc = true
   s.ios.deployment_target = '13.0'
 
-  s.source_files = 'Sources/**/*.swift'
+  s.source_files = 'Sources/*.swift'
   s.swift_version = "5.2"
   s.platforms = {
       "ios" => "13.0"
