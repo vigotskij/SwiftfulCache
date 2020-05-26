@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftfulCache
 
 class ViewController: UIViewController {
 

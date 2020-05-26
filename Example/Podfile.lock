@@ -1,0 +1,16 @@
+PODS:
+  - SwiftfulCache (0.1.0)
+
+DEPENDENCIES:
+  - SwiftfulCache (from `../`)
+
+EXTERNAL SOURCES:
+  SwiftfulCache:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  SwiftfulCache: 16a4bc0352bb582be52f533ec71b373ec06b2aee
+
+PODFILE CHECKSUM: c60964758083d56b986741db7968922a105813cb
+
+COCOAPODS: 1.9.2
