@@ -5,6 +5,8 @@
 //  Copyright © 2020 Boris Sortino.
 //
 
+import Foundation
+
 public final class Cache<Key: Hashable, Value> {
     private let wrappedCache = NSCache<WrappedKey, CachedItem>()
     private let dateProvider: () -> Date

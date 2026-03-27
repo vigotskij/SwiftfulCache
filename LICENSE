@@ -1,4 +1,6 @@
-Copyright (c) 2020 vigotskij <boris.sortino@gmail.com>
+MIT License
+
+Copyright (c) 2020 Boris Sortino <boris.sortino@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -9,6 +11,19 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
+
+ADDITIONAL RESTRICTION — ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING
+
+The Software, including its source code, documentation, and any associated
+files, SHALL NOT be used, in whole or in part, for the purpose of training,
+fine-tuning, or otherwise developing artificial intelligence models, machine
+learning systems, large language models, neural networks, or any similar
+technology, whether commercial or non-commercial, without the explicit prior
+written consent of the copyright holder.
+
+This restriction applies regardless of whether the Software is accessed
+directly, through a dataset, through a code hosting platform, or through any
+other means.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
