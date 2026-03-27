@@ -4,30 +4,38 @@
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%2013+-blue.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20AI%20Restriction-lightgrey.svg)](LICENSE)
 
-A lightweight Swift wrapper around `NSCache` that provides both volatile (in-memory) and persistent (disk-backed) caching with expiration support.
+SwiftfulCache is a lightweight wrapper around `NSCache` that adds expiration and optional disk persistence for `Codable` types.
 
 ## Features
 
-- **Volatile cache** — in-memory caching backed by `NSCache` with automatic eviction and configurable limits
-- **Persistent cache** — JSON-based disk persistence for `Codable` types
-- **Expiration** — configurable cache lifetime with automatic cleanup of stale entries
-- **Subscript access** — read and write cache entries with `cache[key]` syntax
-- **Pure Swift** — no external dependencies
+- In-memory caching backed by `NSCache`
+- Configurable cache lifetime (expiration)
+- Configurable maximum number of cached values
+- Optional JSON persistence for `Codable` key/value pairs
+- Easy API with `set`, `get`, `remove`, `getKeys`, and subscript support
+- No external dependencies
+
+## Requirements
+
+- Swift 6+
+- iOS 18.0+
 
 ## Installation
 
 ### Swift Package Manager
 
-Add SwiftfulCache to your project via Xcode:
+Add SwiftfulCache in Xcode:
 
 1. Go to **File > Add Package Dependencies...**
-2. Enter the repository URL:
+2. Use the repository URL:
+
    ```
    https://github.com/vigotskij/SwiftfulCache.git
    ```
-3. Select your desired version rule and add the package.
 
-Or add it directly to your `Package.swift`:
+3. Select your preferred version rule and add the package.
+
+Or add it to your `Package.swift`:
 
 ```swift
 dependencies: [
@@ -35,7 +43,7 @@ dependencies: [
 ]
 ```
 
-Then add `"SwiftfulCache"` as a dependency of the target that will use it:
+Then add `"SwiftfulCache"` to your target dependencies:
 
 ```swift
 .target(
@@ -44,9 +52,7 @@ Then add `"SwiftfulCache"` as a dependency of the target that will use it:
 )
 ```
 
-## Usage
-
-### Volatile Cache (in-memory)
+## Quick Start
 
 ```swift
 import SwiftfulCache
@@ -56,79 +62,51 @@ let cache = Cache<String, String>(
     maximumCachedValues: 100
 )
 
-// Store a value
 cache.setValue("Hello", forKey: "greeting")
-
-// Retrieve a value
 let value = cache.getValue(forKey: "greeting") as? String
 
-// Subscript access
 cache["greeting"] = "Hi"
 let greeting = cache["greeting"] as? String
 
-// Clear all in-memory entries
+cache.removeValue(forKey: "greeting")
 cache.clearVolatile()
 ```
 
-### Persistent Cache (disk-backed)
+## Persistence
 
-When `Key` and `Value` conform to `Codable`, you get persistence for free:
+If `Key` and `Value` conform to `Codable`, the same cache can persist data to disk and load it back:
 
 ```swift
 let cache = Cache<String, MyCodableModel>()
-
 cache.setValue(model, forKey: "user_profile")
 
-// Persist to disk
-cache.persist(withName: "user_cache", using: .default)
-
-// Load from disk
-cache.load(withName: "user_cache", using: .default)
-
-// Remove persisted file
-cache.clearPersistence(withName: "user_cache", using: .default)
+let persistResult = cache.persist(withName: "user_cache", using: .default)
+let loadResult = cache.load(withName: "user_cache", using: .default)
+let clearResult = cache.clearPersistence(withName: "user_cache", using: .default)
 ```
 
-## Requirements
+Persistence uses the system caches directory by default.
 
-- iOS 13.0+
-- Swift 6+
+## Protocol-based Usage
 
-## Usage
-After that, you can use it importing the framework and initializing a specialized Cache, for example:  
+You can work against the protocols when you want to abstract behavior:
+
 ```swift
- class SomeClass {
-  // You can use only the RAM Cache
-  let volatileCache: VolatileCacheable = Cache<String, YourObject>()
-  // or Persistent which includes Volatile
-  let persistentCache: PersistentCacheable = Cache<String, YourObject>()
-  // or, just the Cache class, which has a few default values on the function signatures.
-  // Using the Cache class will load both Volatile and Persistent Cache
-  let cache: Cache<String, YourObject> = .init()
- }
- ```
+let volatileCache: VolatileCacheable = Cache<String, YourObject>()
+let persistentCache: PersistentCacheable = Cache<String, YourCodableObject>()
+```
 
-For persistent cache, using the `.cachesDirectory` allows the system to clean the files as its own rules. A valid alternative is to use `.documentsDirectory` which will allow you to store the data, as long as your app exists, by your own terms.
+## References
 
-## What is done
-* Volatile cache set, get, remove, get keys, and subscript functions
-* Persistent cache persist to file and load from file to Volatile cache functions
-* Volatile tests for set, get, remove, get keys functions
-* Volatile performance tests for set, get, remove and get keys functions
-* Persistent parcial tests for both persist and load functions
-* Added basic error handling for persist and load functions
-* PersistentCacheable full test coverage for persist and load functions
-* PersistentCacheable performance tests
+- Inspired by [Caching in Swift by John Sundell](https://www.swiftbysundell.com/articles/caching-in-swift/)
+- Apple documentation:
+  - [NSCache](https://developer.apple.com/documentation/foundation/nscache)
+  - [FileManager](https://developer.apple.com/documentation/foundation/filemanager)
 
-# References
-This was created inspired by the [work](https://www.swiftbysundell.com/articles/caching-in-swift/) of [John Sundell](https://github.com/JohnSundell).
-
-And also using Apple's related documentation:
-- [NSCache](https://developer.apple.com/documentation/foundation/nscache)
-- [FileManager](https://developer.apple.com/documentation/foundation/filemanager)## Author
+## Author
 
 [Boris Sortino](https://linkedin.com/in/bsortino/)
 
 ## License
 
-SwiftfulCache is available under the MIT license with an additional restriction prohibiting use for AI/ML training. See the [LICENSE](LICENSE) file for full details.
+SwiftfulCache is available under the MIT license with an additional restriction prohibiting use for AI/ML training. See [LICENSE](LICENSE) for full details.
