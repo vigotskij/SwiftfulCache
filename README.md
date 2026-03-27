@@ -1,6 +1,6 @@
 # SwiftfulCache
 
-[![Swift 5.10](https://img.shields.io/badge/Swift-5.10-orange.svg)](https://swift.org)
+[![Swift 6](https://img.shields.io/badge/Swift-6-orange.svg)](https://swift.org)
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%2013+-blue.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20AI%20Restriction-lightgrey.svg)](LICENSE)
 
@@ -92,7 +92,7 @@ cache.clearPersistence(withName: "user_cache", using: .default)
 ## Requirements
 
 - iOS 13.0+
-- Swift 5.10+
+- Swift 6+
 
 ## Usage
 After that, you can use it importing the framework and initializing a specialized Cache, for example:  
