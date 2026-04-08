@@ -1,33 +1,41 @@
 # SwiftfulCache
 
-[![Swift 5.10](https://img.shields.io/badge/Swift-5.10-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-iOS%2013+-blue.svg)](https://developer.apple.com/ios/)
+[![Swift 6](https://img.shields.io/badge/Swift-6-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%2018+-blue.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20AI%20Restriction-lightgrey.svg)](LICENSE)
 
-A lightweight Swift wrapper around `NSCache` that provides both volatile (in-memory) and persistent (disk-backed) caching with expiration support.
+SwiftfulCache is a lightweight wrapper around `NSCache` that adds expiration and optional disk persistence for `Codable` types.
 
 ## Features
 
-- **Volatile cache** — in-memory caching backed by `NSCache` with automatic eviction and configurable limits
-- **Persistent cache** — JSON-based disk persistence for `Codable` types
-- **Expiration** — configurable cache lifetime with automatic cleanup of stale entries
-- **Subscript access** — read and write cache entries with `cache[key]` syntax
-- **Pure Swift** — no external dependencies
+- In-memory caching backed by `NSCache`
+- Configurable cache lifetime (expiration)
+- Configurable maximum number of cached values
+- Optional JSON persistence for `Codable` key/value pairs
+- Easy API with `set`, `get`, `remove`, `getKeys`, and subscript support
+- No external dependencies
+
+## Requirements
+
+- Swift 6+
+- iOS 18.0+
 
 ## Installation
 
 ### Swift Package Manager
 
-Add SwiftfulCache to your project via Xcode:
+Add SwiftfulCache in Xcode:
 
 1. Go to **File > Add Package Dependencies...**
-2. Enter the repository URL:
+2. Use the repository URL:
+
    ```
    https://github.com/vigotskij/SwiftfulCache.git
    ```
-3. Select your desired version rule and add the package.
 
-Or add it directly to your `Package.swift`:
+3. Select your preferred version rule and add the package.
+
+Or add it to your `Package.swift`:
 
 ```swift
 dependencies: [
@@ -35,7 +43,7 @@ dependencies: [
 ]
 ```
 
-Then add `"SwiftfulCache"` as a dependency of the target that will use it:
+Then add `"SwiftfulCache"` to your target dependencies:
 
 ```swift
 .target(
@@ -44,9 +52,7 @@ Then add `"SwiftfulCache"` as a dependency of the target that will use it:
 )
 ```
 
-## Usage
-
-### Volatile Cache (in-memory)
+## Quick Start
 
 ```swift
 import SwiftfulCache
@@ -56,79 +62,81 @@ let cache = Cache<String, String>(
     maximumCachedValues: 100
 )
 
-// Store a value
 cache.setValue("Hello", forKey: "greeting")
-
-// Retrieve a value
 let value = cache.getValue(forKey: "greeting") as? String
 
-// Subscript access
 cache["greeting"] = "Hi"
 let greeting = cache["greeting"] as? String
 
-// Clear all in-memory entries
+cache.removeValue(forKey: "greeting")
 cache.clearVolatile()
 ```
 
-### Persistent Cache (disk-backed)
+## Persistence
 
-When `Key` and `Value` conform to `Codable`, you get persistence for free:
+If `Key` and `Value` conform to `Codable`, the same cache can persist data to disk and load it back:
 
 ```swift
 let cache = Cache<String, MyCodableModel>()
-
 cache.setValue(model, forKey: "user_profile")
 
-// Persist to disk
-cache.persist(withName: "user_cache", using: .default)
-
-// Load from disk
-cache.load(withName: "user_cache", using: .default)
-
-// Remove persisted file
-cache.clearPersistence(withName: "user_cache", using: .default)
+let persistResult = cache.persist(withName: "user_cache", using: .default)
+let loadResult = cache.load(withName: "user_cache", using: .default)
+let clearResult = cache.clearPersistence(withName: "user_cache", using: .default)
 ```
 
-## Requirements
+Persistence uses the system caches directory by default.
 
-- iOS 13.0+
-- Swift 5.10+
+## Protocol-based Usage
 
-## Usage
-After that, you can use it importing the framework and initializing a specialized Cache, for example:  
+You can work against the protocols when you want to abstract behavior:
+
 ```swift
- class SomeClass {
-  // You can use only the RAM Cache
-  let volatileCache: VolatileCacheable = Cache<String, YourObject>()
-  // or Persistent which includes Volatile
-  let persistentCache: PersistentCacheable = Cache<String, YourObject>()
-  // or, just the Cache class, which has a few default values on the function signatures.
-  // Using the Cache class will load both Volatile and Persistent Cache
-  let cache: Cache<String, YourObject> = .init()
- }
- ```
+let volatileCache: VolatileCacheable = Cache<String, YourObject>()
+let persistentCache: PersistentCacheable = Cache<String, YourCodableObject>()
+```
 
-For persistent cache, using the `.cachesDirectory` allows the system to clean the files as its own rules. A valid alternative is to use `.documentsDirectory` which will allow you to store the data, as long as your app exists, by your own terms.
+## CI and Releases
 
-## What is done
-* Volatile cache set, get, remove, get keys, and subscript functions
-* Persistent cache persist to file and load from file to Volatile cache functions
-* Volatile tests for set, get, remove, get keys functions
-* Volatile performance tests for set, get, remove and get keys functions
-* Persistent parcial tests for both persist and load functions
-* Added basic error handling for persist and load functions
-* PersistentCacheable full test coverage for persist and load functions
-* PersistentCacheable performance tests
+This repository uses GitHub Actions for automation:
 
-# References
-This was created inspired by the [work](https://www.swiftbysundell.com/articles/caching-in-swift/) of [John Sundell](https://github.com/JohnSundell).
+- On each PR, CI runs the shared checks:
+  - `yarn lane:lint` (strict concurrency + warnings-as-errors)
+  - `yarn lane:test`
+- On push to `main`, the release workflow runs the same checks and then runs `semantic-release` (executed with Yarn).
 
-And also using Apple's related documentation:
-- [NSCache](https://developer.apple.com/documentation/foundation/nscache)
-- [FileManager](https://developer.apple.com/documentation/foundation/filemanager)## Author
+These shared commands are intentionally "lane-like" so they can be reused later from Fastlane lanes.
+
+Security hardening applied in CI workflows:
+
+- Least-privilege GitHub token permissions on PR workflows
+- JavaScript actions pinned to immutable commit SHAs
+- Read-only checkout credentials on PR workflows
+- Dependency installs with script execution disabled
+
+Release behavior from commit titles:
+
+- `feat:` -> minor release
+- `fix:`, `perf:`, `chore:` -> patch release
+- `BREAKING CHANGE` or `!` after type/scope -> major release
+- Add `(no-release)` anywhere in the commit message to skip release for that commit
+
+Examples:
+
+- `chore: update docs` -> patch release
+- `chore: update docs (no-release)` -> no release
+
+## References
+
+- Inspired by [Caching in Swift by John Sundell](https://www.swiftbysundell.com/articles/caching-in-swift/)
+- Apple documentation:
+  - [NSCache](https://developer.apple.com/documentation/foundation/nscache)
+  - [FileManager](https://developer.apple.com/documentation/foundation/filemanager)
+
+## Author
 
 [Boris Sortino](https://linkedin.com/in/bsortino/)
 
 ## License
 
-SwiftfulCache is available under the MIT license with an additional restriction prohibiting use for AI/ML training. See the [LICENSE](LICENSE) file for full details.
+SwiftfulCache is available under the MIT license with an additional restriction prohibiting use for AI/ML training. See [LICENSE](LICENSE) for full details.

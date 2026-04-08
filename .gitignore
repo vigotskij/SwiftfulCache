@@ -23,3 +23,6 @@ DerivedData
 .build/
 .swiftpm/
 Package.resolved
+
+# Node (semantic-release tooling)
+node_modules/
