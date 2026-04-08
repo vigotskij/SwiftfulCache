@@ -5,6 +5,8 @@
 //  Copyright © 2020 Boris Sortino.
 //
 
+import Foundation
+
 public protocol VolatileCacheable {
     /// Sets the pair value and key to be stored in a Cache object
     /// - Parameters:

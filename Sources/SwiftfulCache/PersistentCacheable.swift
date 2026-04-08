@@ -5,6 +5,8 @@
 //  Copyright © 2020 Boris Sortino.
 //
 
+import Foundation
+
 public protocol PersistentCacheable: VolatileCacheable {
     /// This function will store the data from the Volatile Cache.
     /// Function's result will be `.success(true)` if the process was successful and `.failure(Error)` in any failure scenario
