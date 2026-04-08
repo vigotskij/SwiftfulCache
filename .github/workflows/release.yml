@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+# Default Actions token is read-only here; pushes/releases use RELEASE_TOKEN.
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Semantic release
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }}
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 24
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install Yarn
+        run: npm install -g yarn@1.22.22 --ignore-scripts --no-audit --fund=false
+
+      - name: Install release dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts --non-interactive
+
+      - name: Run pre-release checks
+        run: yarn ci:release-check
+
+      # Signing + semantic-release must run in one step: ssh-agent does not persist across steps.
+      - name: Configure SSH signing and run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          SSH_SIGNING_PRIVATE_KEY: ${{ secrets.SSH_RELEASE_SIGNING }}
+        run: |
+          set -euo pipefail
+          git config --global user.name "vigotskij"
+          git config --global user.email "7464426+vigotskij@users.noreply.github.com"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_SIGNING_PRIVATE_KEY" > ~/.ssh/git_signing_key
+          chmod 600 ~/.ssh/git_signing_key
+          ssh-keygen -y -f ~/.ssh/git_signing_key > ~/.ssh/git_signing_key.pub
+          chmod 644 ~/.ssh/git_signing_key.pub
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/git_signing_key.pub
+          git config --global commit.gpgsign true
+          # Child of ssh-agent inherits SSH_AUTH_SOCK; no eval needed.
+          ssh-agent bash -c 'ssh-add ~/.ssh/git_signing_key && yarn semantic-release'

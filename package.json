@@ -1,0 +1,21 @@
+{
+  "name": "swiftfulcache-release",
+  "private": true,
+  "packageManager": "yarn@1.22.22",
+  "scripts": {
+    "lane:lint": "swift build -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors",
+    "lane:test": "swift test",
+    "ci:pr-check": "yarn lane:lint && yarn lane:test",
+    "ci:release-check": "yarn ci:pr-check",
+    "semantic-release": "semantic-release",
+    "release": "yarn semantic-release"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.0",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^24.2.7"
+  }
+}
